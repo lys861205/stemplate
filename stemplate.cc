@@ -373,7 +373,12 @@ int Stemplate::get_buffer_size()
   {
     p_part = list_entry(pos, part_t, list); 
     if (nullptr != p_part) {
-      size += p_part->len;
+      if (p_part->is_section) {
+        Stemplate* p_templ = (Stemplate*)p_part->ptr;
+        if (p_templ) size += p_templ->get_buffer_size();
+      } else {
+        size += p_part->len;
+      }
     }
   }
   return size;
