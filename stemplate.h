@@ -12,7 +12,7 @@ class Stemplate
   {
     Tag_common = 0,
     Tag_section = 1,
-    Tag_repeated = 2
+    Tag_repeated = 2 //not implement
   };
   #define REPLACE_STR_SIZE 512
   typedef struct {
