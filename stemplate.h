@@ -10,9 +10,9 @@ class Stemplate
 {
   #define REPLACE_STR_SIZE 512
   typedef struct {
-    list_head list;
     bool is_section;
     int len;
+    list_head list;
     union {
       void* ptr;
       char buffer[0];
@@ -35,6 +35,7 @@ public:
   int set_value(const char* tag, uint64_t value);
   int set_value(const char* tag, float value);
   int set_value(const char* tag, double value);
+  int render_and_drop_crlf(std::string& output);
   int render(std::string& output);
   int render(char* buffer, size_t* size);
 private:

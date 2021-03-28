@@ -18,14 +18,18 @@ Stemplate::Stemplate():
 Stemplate::~Stemplate()
 {
   list_head* pos;
+  list_head* n;
   part_t* part;
-  list_for_each(pos, &head)
+  list_for_each_safe(pos, n, &head)
   {
     part = list_entry(pos, part_t, list); 
     if (part) 
     {
-      if (part->is_section) delete (Stemplate*)part->ptr;
-      //free(part);
+      if (part->is_section) 
+      {
+        delete (Stemplate*)part->ptr;
+      }
+      free((void*)part);
     }
     part = nullptr;
   }
@@ -39,6 +43,7 @@ int Stemplate::load(const char* file)
   }
   FILE* fp = fopen(file, "r");
   if (nullptr == fp) {
+    fprintf(stderr, "fopen file %s failed.\n", file);
     return -1;
   }
   int ret = 0;
@@ -318,6 +323,33 @@ int Stemplate::render(std::string& output)
       }
       else 
       {
+        output.append(p_part->buffer, p_part->len);
+      }
+    }
+  }
+  return 0;
+}
+
+int Stemplate::render_and_drop_crlf(std::string& output)
+{
+  list_head* pos;
+  part_t* p_part;
+  list_for_each(pos, &head)
+  {
+    p_part = list_entry(pos, part_t, list);
+    if (nullptr != p_part) {
+      if (p_part->is_section) 
+      {
+        Stemplate* ptempl = (Stemplate*)p_part->ptr;
+        ptempl->render_and_drop_crlf(output);
+      }
+      else if (p_part->len == 2 && strncmp(p_part->buffer, "\r\n", 2) ==0) {
+        continue;
+      }
+      else if (p_part->len == 1 && strncmp(p_part->buffer, "\n", 1) ==0) {
+        continue;
+      }
+      else {
         output.append(p_part->buffer, p_part->len);
       }
     }

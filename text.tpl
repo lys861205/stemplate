@@ -2,8 +2,7 @@
 {{#section}}
 {{TEXT}}
 {{/section}}
-
-{{XXXX}}
+{{TEXT}}
 {{YYYY}}
 </body>
 
