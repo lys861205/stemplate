@@ -12,7 +12,6 @@
   {{/}} 表示一个块占位符的结束
   
  ## 使用demo
- [[
  <html>
  <h1>
  {{TITLE}}
@@ -22,8 +21,6 @@
  {{TEXT}}
  </body>
  {{/section}}
-  ]]
- ···
   
  ```
 Stemplate template;
