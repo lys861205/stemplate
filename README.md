@@ -13,7 +13,7 @@
   
  ## 使用demo
  ```
- \<html\>
+ <html>
  <h1>
  {{TITLE}}
  </h1>
@@ -22,6 +22,7 @@
  {{TEXT}}
  </body>
  {{/section}}
+ </html>
  ```
   
  ```
