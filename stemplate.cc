@@ -22,9 +22,15 @@ Stemplate::~Stemplate()
   list_for_each(pos, &head)
   {
     part = list_entry(pos, part_t, list); 
+    if (part) 
+    {
+      if (part->is_section) delete (Stemplate*)part->ptr;
+      //free(part);
+    }
     part = nullptr;
   }
 }
+
 
 int Stemplate::load(const char* file)
 {
@@ -58,7 +64,7 @@ int Stemplate::load(const char* file)
   return ret;
 }
 
-int Stemplate::load_buffer(const char* str)
+int Stemplate::load_buffer(const char* str, bool section_parsed)
 {
   if (nullptr == str) 
     return -1;
@@ -69,22 +75,30 @@ int Stemplate::load_buffer(const char* str)
     Text_End = 1,
     Tag_Begin = 2,
     Tag_End = 3,
-    Text_Eof = 4,
+    Section_Tag_Begin = 4,
+    Section_Tag_End = 5,
+    Text_Eof = 6,
   }s;
+  Stemplate *p_temp = nullptr;
   const char* p = str;
   const char* q = p;
-  std::string tag, value;
+  std::string tag, value, tag1;
   s = Text;
   ++p;
+  int offset = 0;
   while (*q != '\0') 
   {
+    ++offset;
     if (*p == '\0') {
       s = Text_Eof;
     }
     switch(s)
     {
       case Text:
-        if (*p == '{') {
+        if (*p == '{' && *q == '{') {
+          s = Tag_Begin;
+        }
+        else if (*p == '{') {
           value.push_back(*q);
           s = Text_End;
         }
@@ -99,6 +113,7 @@ int Stemplate::load_buffer(const char* str)
             return -1;
           }
           part->len = value.size();
+          part->is_section = false;
           memset(part->buffer, 0x00, part->len);
           memcpy(part->buffer, value.c_str(), part->len);
           list_add_tail(&part->list, &head);
@@ -111,7 +126,16 @@ int Stemplate::load_buffer(const char* str)
         }
       break;
       case Tag_Begin:
-        if (*p == '}') {
+        if (*p == '#') {
+          s = Section_Tag_Begin;
+        }
+        else if (*p == '/' && section_parsed) {
+          return offset;
+        }
+        else if (*p == '/') {
+          s = Section_Tag_End;
+        }
+        else if (*p == '}') {
           s = Tag_End;
         }
         else if (*p != '{') {
@@ -124,6 +148,7 @@ int Stemplate::load_buffer(const char* str)
           if (nullptr == part) {
             return -1;
           }
+          part->is_section = false;
           list_add_tail(&part->list, &head);
           _tag_list[tag] = &part->list;
           tag.clear();
@@ -134,11 +159,49 @@ int Stemplate::load_buffer(const char* str)
           return -1;
         }
       break;
+      case Section_Tag_Begin:
+        if (*q == '}') {
+          p_temp = new Stemplate(_placeholder_size);
+          if (nullptr == p_temp) 
+            return -1;
+          int pos = p_temp->load_buffer(p+1, true); 
+          p += pos + 1;
+          q += pos + 1;
+          s = Section_Tag_End;
+        } else if (*p != '}') {
+          tag.push_back(*p);
+        }
+      break;
+      case Section_Tag_End:
+        if (*p == '}') {
+          if (tag != tag1) {
+            if (p_temp != nullptr) {delete p_temp; p_temp = nullptr;}
+            fprintf(stderr, "file content format error.\n");
+            return -1;
+          }
+          else {
+            part_t* part = (part_t*)malloc(sizeof(part_t));
+            if (nullptr == part) {
+              return -1;
+            }
+            part->is_section = true;
+            part->ptr = p_temp;
+            list_add_tail(&part->list, &head);
+            _tag_list[tag] = &part->list;
+            tag.clear();
+            tag1.clear();
+            s = Text;
+          }
+        } else {
+          tag1.push_back(*p);       
+        }
+      break;
       case Text_Eof:
           part_t* part = (part_t*)malloc(sizeof(part_t) + value.size());
           if (nullptr == part){
             return -1;
           }
+          part->is_section = false;
           part->len = value.size();
           memset(part->buffer, 0x00, part->len);
           memcpy(part->buffer, value.c_str(), part->len);
@@ -247,8 +310,17 @@ int Stemplate::render(std::string& output)
   list_for_each(pos, &head)
   {
     p_part = list_entry(pos, part_t, list);
-    if (nullptr != p_part)
-      output.append(p_part->buffer, p_part->len);
+    if (nullptr != p_part) {
+      if (p_part->is_section) 
+      {
+        Stemplate* ptempl = (Stemplate*)p_part->ptr;
+        ptempl->render(output);
+      }
+      else 
+      {
+        output.append(p_part->buffer, p_part->len);
+      }
+    }
   }
   return 0;
 }
@@ -273,6 +345,18 @@ int Stemplate::get_buffer_size()
     }
   }
   return size;
+}
+
+Stemplate* Stemplate::mutable_template(const char* tag)
+{
+  part_t* p_part = get_part(tag);
+  if (nullptr == p_part) 
+    return nullptr;
+   
+  if (!p_part->is_section)
+    return nullptr;
+
+  return (Stemplate*)p_part->ptr;
 }
 
 Stemplate::part_t* Stemplate::get_part(const char* tag)

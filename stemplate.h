@@ -11,8 +11,12 @@ class Stemplate
   #define REPLACE_STR_SIZE 512
   typedef struct {
     list_head list;
+    bool is_section;
     int len;
-    char buffer[0];
+    union {
+      void* ptr;
+      char buffer[0];
+    };
   } part_t;
 public:
   Stemplate(int size);
@@ -20,7 +24,8 @@ public:
   ~Stemplate();
 
   int load(const char* file);
-  int load_buffer(const char* str);
+  int load_buffer(const char* str, bool section_parsed = false);
+  Stemplate* mutable_template(const char* tag);
   int get_buffer_size();
   int set_value(const char* tag, const char* value, size_t size);
   int set_value(const char* tag, const std::string& value);

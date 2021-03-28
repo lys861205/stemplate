@@ -12,7 +12,9 @@ int main()
     exit(1);
   }
 
-  temp.set_value("TEXT", "Hello Stemplate");
+  Stemplate* pTempl = temp.mutable_template("section");
+  if (pTempl)
+    pTempl->set_value("TEXT", "Hello Stemplate");
   temp.set_value("XXXX", 40);
   temp.set_value("YYYY", 1.5);
 

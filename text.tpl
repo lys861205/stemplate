@@ -1,11 +1,9 @@
 <body>
+{{#section}}
 {{TEXT}}
+{{/section}}
+
+{{XXXX}}
+{{YYYY}}
 </body>
 
-<h1>
-{{XXXX}}
-</h1>
-
-<h2>
-{{YYYY}}
-</h2>
