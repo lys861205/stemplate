@@ -8,11 +8,17 @@
 
 class Stemplate 
 {
+  enum TagType 
+  {
+    Tag_common = 0,
+    Tag_section = 1,
+    Tag_repeated = 2
+  };
   #define REPLACE_STR_SIZE 512
   typedef struct {
-    bool is_section;
-    int len;
     list_head list;
+    TagType type;
+    int len;
     union {
       void* ptr;
       char buffer[0];

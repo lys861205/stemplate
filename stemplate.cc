@@ -25,7 +25,7 @@ Stemplate::~Stemplate()
     part = list_entry(pos, part_t, list); 
     if (part) 
     {
-      if (part->is_section) 
+      if (part->type == Tag_section)
       {
         delete (Stemplate*)part->ptr;
       }
@@ -118,7 +118,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
             return -1;
           }
           part->len = value.size();
-          part->is_section = false;
+          part->type = Tag_common;
           memset(part->buffer, 0x00, part->len);
           memcpy(part->buffer, value.c_str(), part->len);
           list_add_tail(&part->list, &head);
@@ -153,7 +153,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
           if (nullptr == part) {
             return -1;
           }
-          part->is_section = false;
+          part->type = Tag_common;
           list_add_tail(&part->list, &head);
           _tag_list[tag] = &part->list;
           tag.clear();
@@ -189,7 +189,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
             if (nullptr == part) {
               return -1;
             }
-            part->is_section = true;
+            part->type = Tag_section;
             part->ptr = p_temp;
             list_add_tail(&part->list, &head);
             _tag_list[tag] = &part->list;
@@ -206,7 +206,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
           if (nullptr == part){
             return -1;
           }
-          part->is_section = false;
+          part->type = Tag_common;
           part->len = value.size();
           memset(part->buffer, 0x00, part->len);
           memcpy(part->buffer, value.c_str(), part->len);
@@ -316,7 +316,7 @@ int Stemplate::render(std::string& output)
   {
     p_part = list_entry(pos, part_t, list);
     if (nullptr != p_part) {
-      if (p_part->is_section) 
+      if (p_part->type == Tag_section)
       {
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
         ptempl->render(output);
@@ -338,7 +338,7 @@ int Stemplate::render_and_drop_crlf(std::string& output)
   {
     p_part = list_entry(pos, part_t, list);
     if (nullptr != p_part) {
-      if (p_part->is_section) 
+      if (p_part->type == Tag_section) 
       {
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
         ptempl->render_and_drop_crlf(output);
@@ -373,7 +373,7 @@ int Stemplate::get_buffer_size()
   {
     p_part = list_entry(pos, part_t, list); 
     if (nullptr != p_part) {
-      if (p_part->is_section) {
+      if (p_part->type == Tag_section) {
         Stemplate* p_templ = (Stemplate*)p_part->ptr;
         if (p_templ) size += p_templ->get_buffer_size();
       } else {
@@ -390,7 +390,7 @@ Stemplate* Stemplate::mutable_template(const char* tag)
   if (nullptr == p_part) 
     return nullptr;
    
-  if (!p_part->is_section)
+  if (p_part->type == Tag_common)
     return nullptr;
 
   return (Stemplate*)p_part->ptr;
