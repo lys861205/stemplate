@@ -2,7 +2,8 @@
 
 {{#section}}
 <html>
-{{TEXT}}
+<age>{{Age}}</age>
+<name>{{Name}}</name>
 </html>
 {{/section}}
 

@@ -15,17 +15,23 @@ int main()
   Stemplate* pTempl = temp.mutable_template("section");
   if (pTempl)
   {
-    pTempl->set_value("TEXT", "Hello C++");
+    pTempl->set_value("Age", 0);
+    pTempl->set_value("Name", "Hello C++");
     pTempl->add_drop_crlf();
-    pTempl->set_value("TEXT", "Hello Lua");
+    pTempl->set_value("Age", 1);
+    pTempl->set_value("Name", "Hello Lua");
     pTempl->add_drop_crlf();
-    pTempl->set_value("TEXT", "Hello Python");
+    pTempl->set_value("Age", 2);
+    pTempl->set_value("Name", "Hello Python");
     pTempl->add_drop_crlf();
-    pTempl->set_value("TEXT", "Hello Golang");
+    pTempl->set_value("Age", 3);
+    pTempl->set_value("Name", "Hello Golang");
     pTempl->add_drop_crlf();
-    pTempl->set_value("TEXT", "Hello Java");
+    pTempl->set_value("Age", 4);
+    pTempl->set_value("Name", "Hello Java");
     pTempl->add_drop_crlf();
-    pTempl->set_value("TEXT", "Hello Ruby");
+    pTempl->set_value("Age", 5);
+    pTempl->set_value("Name", "Hello Ruby");
     pTempl->add_drop_crlf();
   }
 
