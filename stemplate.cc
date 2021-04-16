@@ -4,13 +4,15 @@
 #include <algorithm>
 
 Stemplate::Stemplate(int size):
-  _placeholder_size(size)
+  _placeholder_size(size),
+  _has_more(false)
 {
   INIT_LIST_HEAD(&head);
 }
 
 Stemplate::Stemplate():
-  _placeholder_size(128)
+  _placeholder_size(128),
+  _has_more(false)
 {
   INIT_LIST_HEAD(&head);
 }
@@ -319,7 +321,12 @@ int Stemplate::render(std::string& output)
       if (p_part->type == Tag_section)
       {
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
-        ptempl->render(output);
+        if (ptempl->_has_more) {
+          output.append(ptempl->_output);
+          ptempl->_has_more = false;
+        } else {
+          ptempl->render(output);
+        }
       }
       else 
       {
@@ -341,7 +348,12 @@ int Stemplate::render_and_drop_crlf(std::string& output)
       if (p_part->type == Tag_section) 
       {
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
-        ptempl->render_and_drop_crlf(output);
+        if (ptempl->_has_more) {
+          output.append(ptempl->_output);
+          ptempl->_has_more = false;
+        } else {
+          ptempl->render_and_drop_crlf(output);
+        }
       }
       else if (p_part->len == 2 && strncmp(p_part->buffer, "\r\n", 2) ==0) {
         continue;
@@ -394,6 +406,22 @@ Stemplate* Stemplate::mutable_template(const char* tag)
     return nullptr;
 
   return (Stemplate*)p_part->ptr;
+}
+
+void Stemplate::add()
+{
+  std::string str;
+  render(str);
+  _output.append(str);
+  _has_more = true;
+}
+
+void Stemplate::add_drop_crlf()
+{
+  std::string str;
+  render_and_drop_crlf(str);
+  _output.append(str);
+  _has_more = true;
 }
 
 Stemplate::part_t* Stemplate::get_part(const char* tag)

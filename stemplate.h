@@ -12,7 +12,6 @@ class Stemplate
   {
     Tag_common = 0,
     Tag_section = 1,
-    Tag_repeated = 2 //not implement
   };
   #define REPLACE_STR_SIZE 512
   typedef struct {
@@ -32,6 +31,8 @@ public:
   int load(const char* file);
   int load_buffer(const char* str, bool section_parsed = false);
   Stemplate* mutable_template(const char* tag);
+  void add();
+  void add_drop_crlf();
   int get_buffer_size();
   int set_value(const char* tag, const char* value, size_t size);
   int set_value(const char* tag, const std::string& value);
@@ -47,9 +48,11 @@ public:
 private:
   part_t* get_part(const char* tag);
 private:
+  std::string _output;
   std::map<std::string, list_head*> _tag_list;
   list_head head;
   int _placeholder_size;
+  bool _has_more;
 };
 
 #endif // __S_TEMPLATE_H__
