@@ -425,14 +425,6 @@ void Stemplate::add()
   _has_more = true;
 }
 
-void Stemplate::add_drop_crlf()
-{
-  std::string str;
-  render_and_drop_crlf(str);
-  _output.append(str);
-  _has_more = true;
-}
-
 Stemplate::part_t* Stemplate::get_part(const char* tag)
 {
   std::string tagstr(tag); 

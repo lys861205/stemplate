@@ -33,7 +33,6 @@ public:
   int load_buffer(const char* str, bool section_parsed = false);
   Stemplate* mutable_template(const char* tag);
   void add();
-  void add_drop_crlf();
   int get_buffer_size();
   int set_value(const char* tag, const char* value, size_t size);
   int set_value(const char* tag, const std::string& value);

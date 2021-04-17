@@ -17,19 +17,19 @@ int main()
   {
     pTempl->set_value("Age", 0);
     pTempl->set_value("Name", "Hello C++");
-    pTempl->add_drop_crlf();
+    pTempl->add();
     pTempl->set_value("Age", 1);
     pTempl->set_value("Name", "Hello Lua");
-    pTempl->add_drop_crlf();
+    pTempl->add();
     pTempl->set_value("Age", 2);
     pTempl->set_value("Name", "Hello Python");
-    pTempl->add_drop_crlf();
+    pTempl->add();
     pTempl->set_value("Age", 3);
     pTempl->set_value("Name", "Hello Golang");
-    pTempl->add_drop_crlf();
+    pTempl->add();
     pTempl->set_value("Age", 4);
     pTempl->set_value("Name", "Hello Java");
-    pTempl->add_drop_crlf();
+    pTempl->add();
   }
 
   temp.set_value("YYYY", 1.5);
@@ -41,7 +41,7 @@ int main()
   output.clear();
   pTempl->set_value("Age", 5);
   pTempl->set_value("Name", "Hello Java");
-  pTempl->add_drop_crlf();
+  pTempl->add();
   temp.set_value("YYYY", "YYYY");
   temp.set_value("TEXT", "Hello second");
   temp.render(output);
