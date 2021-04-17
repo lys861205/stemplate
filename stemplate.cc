@@ -323,6 +323,7 @@ int Stemplate::render(std::string& output)
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
         if (ptempl->_has_more) {
           output.append(ptempl->_output);
+		  ptempl->_output.clear();//clear
           ptempl->_has_more = false;
         } else {
           ptempl->render(output);
@@ -331,6 +332,7 @@ int Stemplate::render(std::string& output)
       else 
       {
         output.append(p_part->buffer, p_part->len);
+		p_part->len = 0; //clear
       }
     }
   }
@@ -350,6 +352,7 @@ int Stemplate::render_and_drop_crlf(std::string& output)
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
         if (ptempl->_has_more) {
           output.append(ptempl->_output);
+		  ptempl->_output.clear();
           ptempl->_has_more = false;
         } else {
           ptempl->render_and_drop_crlf(output);
@@ -363,6 +366,7 @@ int Stemplate::render_and_drop_crlf(std::string& output)
       }
       else {
         output.append(p_part->buffer, p_part->len);
+		p_part->len = 0; //clear
       }
     }
   }
