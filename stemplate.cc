@@ -120,7 +120,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
             return -1;
           }
           part->len = value.size();
-          part->type = Tag_common;
+          part->type = Tag_value;
           memset(part->buffer, 0x00, part->len);
           memcpy(part->buffer, value.c_str(), part->len);
           list_add_tail(&part->list, &head);
@@ -208,7 +208,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
           if (nullptr == part){
             return -1;
           }
-          part->type = Tag_common;
+          part->type = Tag_value;
           part->len = value.size();
           memset(part->buffer, 0x00, part->len);
           memcpy(part->buffer, value.c_str(), part->len);
@@ -323,7 +323,7 @@ int Stemplate::render(std::string& output)
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
         if (ptempl->_has_more) {
           output.append(ptempl->_output);
-		  ptempl->_output.clear();//clear
+          ptempl->_output.clear();
           ptempl->_has_more = false;
         } else {
           ptempl->render(output);
@@ -332,7 +332,9 @@ int Stemplate::render(std::string& output)
       else 
       {
         output.append(p_part->buffer, p_part->len);
-		p_part->len = 0; //clear
+      }
+      if (p_part->type == Tag_common) {
+        p_part->len = 0;
       }
     }
   }
@@ -352,24 +354,27 @@ int Stemplate::render_and_drop_crlf(std::string& output)
         Stemplate* ptempl = (Stemplate*)p_part->ptr;
         if (ptempl->_has_more) {
           output.append(ptempl->_output);
-		  ptempl->_output.clear();
+          ptempl->_output.clear();
           ptempl->_has_more = false;
         } else {
           ptempl->render_and_drop_crlf(output);
         }
       }
-      else if (p_part->len == 2 && strncmp(p_part->buffer, "\r\n", 2) ==0) {
-        continue;
-      }
-      else if (p_part->len == 1 && strncmp(p_part->buffer, "\n", 1) ==0) {
-        continue;
-      }
+      // else if (p_part->len == 2 && strncmp(p_part->buffer, "\r\n", 2) ==0) {
+      //   continue;
+      // }
+      // else if (p_part->len == 1 && strncmp(p_part->buffer, "\n", 1) ==0) {
+      //   continue;
+      // }
       else {
         output.append(p_part->buffer, p_part->len);
-		p_part->len = 0; //clear
+      }
+      if (p_part->type == Tag_common) {
+        p_part->len = 0;
       }
     }
   }
+  output.erase(std::unique(output.begin(), output.end(),[](char a, char b) { return a == '\n' && b == '\n';}), output.end());
   return 0;
 }
 
@@ -406,7 +411,7 @@ Stemplate* Stemplate::mutable_template(const char* tag)
   if (nullptr == p_part) 
     return nullptr;
    
-  if (p_part->type == Tag_common)
+  if (p_part->type != Tag_section)
     return nullptr;
 
   return (Stemplate*)p_part->ptr;

@@ -10,8 +10,9 @@ class Stemplate
 {
   enum TagType 
   {
-    Tag_common = 0,
-    Tag_section = 1,
+    Tag_value = 0,
+    Tag_common = 1,
+    Tag_section = 2,
   };
   #define REPLACE_STR_SIZE 512
   typedef struct {

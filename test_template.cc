@@ -30,20 +30,21 @@ int main()
     pTempl->set_value("Age", 4);
     pTempl->set_value("Name", "Hello Java");
     pTempl->add_drop_crlf();
-    pTempl->set_value("Age", 5);
-    pTempl->set_value("Name", "Hello Ruby");
-    pTempl->add_drop_crlf();
   }
 
   temp.set_value("YYYY", 1.5);
   temp.set_value("TEXT", "Hello string");
-
-  //printf("===============full content\n");
   std::string output;
+  temp.render_and_drop_crlf(output);
+  printf("%s\n", output.c_str());
+  printf("second render===================\n");
+  output.clear();
+  pTempl->set_value("Age", 5);
+  pTempl->set_value("Name", "Hello Java");
+  pTempl->add_drop_crlf();
+  temp.set_value("YYYY", "YYYY");
+  temp.set_value("TEXT", "Hello second");
   temp.render(output);
   printf("%s\n", output.c_str());
-  output.clear();
-  //temp.render_and_drop_crlf(output);
-  //printf("%s\n", output.c_str());
   return 0;
 }
