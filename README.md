@@ -1,5 +1,5 @@
 # stemplate
-c++实现简单的模版文件渲染，性能跟[ctemplate](https://github.com/OlafvdSpek/ctemplate)比较，提升了30%
+c++实现简单的模版文件渲染，性能跟[ctemplate](https://github.com/OlafvdSpek/ctemplate)比较，提升了25%
 
 ## 格式
 * 基本占位符符号定义
