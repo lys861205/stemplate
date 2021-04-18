@@ -2,9 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/time.h>
 
-int main()
+int main(int argc, char* argv[])
 {
+  uint64_t loop = 1000000;
+  if (argc == 2) {
+    loop = atoi(argv[1]);
+  }
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  uint64_t start = tv.tv_sec * 1000000ULL + tv.tv_usec;
   Stemplate temp;
   if (0 != temp.load("text.tpl"))
   {
@@ -15,36 +23,18 @@ int main()
   Stemplate* pTempl = temp.mutable_template("section");
   if (pTempl)
   {
-    pTempl->set_value("Age", 0);
-    pTempl->set_value("Name", "Hello C++");
-    pTempl->add();
-    pTempl->set_value("Age", 1);
-    pTempl->set_value("Name", "Hello Lua");
-    pTempl->add();
-    pTempl->set_value("Age", 2);
-    pTempl->set_value("Name", "Hello Python");
-    pTempl->add();
-    pTempl->set_value("Age", 3);
-    pTempl->set_value("Name", "Hello Golang");
-    pTempl->add();
-    pTempl->set_value("Age", 4);
-    pTempl->set_value("Name", "Hello Java");
-    pTempl->add();
+    for (int i=0; i < loop; ++i) 
+    {
+      pTempl->set_value("Age", i);
+      pTempl->set_value("Name", std::to_string(i) + " name");
+      pTempl->add();
+    }
   }
-
-  temp.set_value("YYYY", 1.5);
-  temp.set_value("TEXT", "Hello string");
   std::string output;
-  temp.render_and_drop_crlf(output);
-  printf("%s\n", output.c_str());
-  printf("second render===================\n");
-  output.clear();
-  pTempl->set_value("Age", 5);
-  pTempl->set_value("Name", "Hello Java");
-  pTempl->add();
-  temp.set_value("YYYY", "YYYY");
-  temp.set_value("TEXT", "Hello second");
   temp.render(output);
-  printf("%s\n", output.c_str());
+  //printf("%s\n", output.c_str());
+  gettimeofday(&tv, NULL);
+  uint64_t end = tv.tv_sec * 1000000ULL + tv.tv_usec;
+  printf("stemplate cost time: %lu \n", end - start);
   return 0;
 }
