@@ -360,12 +360,6 @@ int Stemplate::render_and_drop_crlf(std::string& output)
           ptempl->render_and_drop_crlf(output);
         }
       }
-      // else if (p_part->len == 2 && strncmp(p_part->buffer, "\r\n", 2) ==0) {
-      //   continue;
-      // }
-      // else if (p_part->len == 1 && strncmp(p_part->buffer, "\n", 1) ==0) {
-      //   continue;
-      // }
       else {
         output.append(p_part->buffer, p_part->len);
       }
@@ -378,10 +372,14 @@ int Stemplate::render_and_drop_crlf(std::string& output)
   return 0;
 }
 
-int Stemplate::render(char* buffer, size_t* size)
+int Stemplate::render(char* buffer, size_t size)
 {
   if (nullptr == buffer || size == 0) 
     return -1;
+  std::string str;
+  render(str);
+  size_t n = std::min(size, str.size());
+  memcpy(buffer, str.c_str(), n);
   return 0;
 }
 
@@ -396,8 +394,14 @@ int Stemplate::get_buffer_size()
     if (nullptr != p_part) {
       if (p_part->type == Tag_section) {
         Stemplate* p_templ = (Stemplate*)p_part->ptr;
-        if (p_templ) size += p_templ->get_buffer_size();
-      } else {
+        if (p_templ && p_templ->_has_more) {
+          size += p_templ->_output.size();
+        }
+        else if (p_templ) {
+          size += p_templ->get_buffer_size();
+        }
+      } 
+      else {
         size += p_part->len;
       }
     }

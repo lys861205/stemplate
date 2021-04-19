@@ -44,7 +44,7 @@ public:
   int set_value(const char* tag, double value);
   int render_and_drop_crlf(std::string& output);
   int render(std::string& output);
-  int render(char* buffer, size_t* size);
+  int render(char* buffer, size_t size);
 private:
   part_t* get_part(const char* tag);
 private:
