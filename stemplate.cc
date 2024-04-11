@@ -53,11 +53,12 @@ int Stemplate::load(const char* file)
     fseek(fp, 0, SEEK_END);
     long size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
-    char* buf = (char*)malloc(size);
+    char* buf = (char*)malloc(size + 1);
     if (nullptr == buf) {
       ret = -1;
       break;
     }
+    memset(buf, 0, size+1);
     size_t n = fread(buf, size, 1, fp);
     if (n != size) {
       ret = -1;
@@ -156,6 +157,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
             return -1;
           }
           part->type = Tag_common;
+          part->len = 0;
           list_add_tail(&part->list, &head);
           _tag_list[tag] = &part->list;
           tag.clear();
@@ -193,6 +195,7 @@ int Stemplate::load_buffer(const char* str, bool section_parsed)
             }
             part->type = Tag_section;
             part->ptr = p_temp;
+            part->len = 0;
             list_add_tail(&part->list, &head);
             _tag_list[tag] = &part->list;
             tag.clear();
